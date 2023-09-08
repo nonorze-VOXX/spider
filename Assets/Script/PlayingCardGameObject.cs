@@ -13,9 +13,11 @@ namespace Script
         private bool canPutDown;
         private Vector2 pastPosition;
         private Vector2 putDownPosition;
+        private CardStack targetStack;
 
         private void Awake()
         {
+            targetStack = null;
             _cardStack = null;
             canPutDown = true;
             _shapeSprite = transform.GetChild(0).GetComponent<SpriteRenderer>();
@@ -42,11 +44,13 @@ namespace Script
         {
             if (canPutDown)
             {
-                transform.position = putDownPosition;
-                print(putDownPosition);
+                 targetStack.PutInCard(this);
             }
             else
+            {
                 transform.position = pastPosition;
+            }
+
             canPutDown = false;
         }
 
@@ -56,8 +60,13 @@ namespace Script
             {
                 canPutDown = true;
                 putDownPosition = other.transform.GetComponent<PlayingCardGameObject>().GetStackPosition();
-                
+                targetStack = other.transform.GetComponent<PlayingCardGameObject>().GetStack();
             }
+        }
+
+        private CardStack GetStack()
+        {
+            return _cardStack;
         }
 
 
@@ -76,7 +85,7 @@ namespace Script
 
         public Vector2 GetStackPosition()
         {
-            return _cardStack.transform.position;
+            return _cardStack.GetNextPosition();
         }
 
         public PlayingCardGameObject SetPlayingCard(PlayingCard pc)

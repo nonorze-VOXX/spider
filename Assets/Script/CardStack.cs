@@ -7,9 +7,12 @@ namespace Script
     {
         public GameObject cardsPrefab;
         private List<PlayingCardGameObject> _playingCardGameObjects;
-        private List<PlayingCard> _playingCards;
 
         private void Start()
+        {
+        }
+
+        public CardStack GeneratePlayingCardGameObject(List<PlayingCard> _playingCards)
         {
             _playingCardGameObjects = new List<PlayingCardGameObject>();
             if (_playingCards == null)
@@ -29,6 +32,8 @@ namespace Script
                     index++;
                 }
             }
+
+            return this;
         }
 
         private Vector3 GetCardPosition(Vector3 position, int index)
@@ -36,11 +41,16 @@ namespace Script
             return new Vector3(position.x, position.y - index * 1, position.z);
         }
 
-        public CardStack SetPlayingcards(List<PlayingCard> playingCards)
+
+        public Vector2 GetNextPosition()
         {
-            print("playing" + playingCards.Count);
-            _playingCards = playingCards;
-            return this;
+            return GetCardPosition(transform.position, _playingCardGameObjects.Count);
+        }
+
+        public void PutInCard(PlayingCardGameObject playingCardGameObject)
+        {
+            playingCardGameObject.transform.position = GetNextPosition();
+            _playingCardGameObjects.Add(playingCardGameObject);
         }
     }
 }

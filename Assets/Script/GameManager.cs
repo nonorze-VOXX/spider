@@ -43,7 +43,7 @@ namespace Script
             foreach (var playingCard in playingCards)
             {
                 var stack = Instantiate(cardStackPrefab, transform).GetComponent<CardStack>()
-                    .SetPlayingcards(playingCard);
+                    .GeneratePlayingCardGameObject(playingCard);
                 _cardStacks.Add(stack);
                 var position = stack.transform.position;
                 position.x = stack.transform.position.x + index * 5;
