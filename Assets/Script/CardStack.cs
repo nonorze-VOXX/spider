@@ -24,7 +24,7 @@ namespace Script
                     print("PC " + pc.GetNumber());
                     var c = Instantiate(cardsPrefab, GetCardPosition(transform.position, index), transform.rotation,
                             transform).GetComponent<PlayingCardGameObject>()
-                        .SetPlayingCard(pc);
+                        .SetPlayingCard(pc).SetStack(this);
                     _playingCardGameObjects.Add(c);
                     index++;
                 }
