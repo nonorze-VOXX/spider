@@ -31,7 +31,7 @@ namespace Script
                     _playingCardGameObjects.Add(c);
                     index++;
                 }
-            }
+           }
 
             return this;
         }
