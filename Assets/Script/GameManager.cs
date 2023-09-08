@@ -46,7 +46,7 @@ namespace Script
                     .SetPlayingcards(playingCard);
                 _cardStacks.Add(stack);
                 var position = stack.transform.position;
-                position.x = stack.transform.position.x + index * 10;
+                position.x = stack.transform.position.x + index * 5;
                 stack.transform.position = position;
 
                 index++;

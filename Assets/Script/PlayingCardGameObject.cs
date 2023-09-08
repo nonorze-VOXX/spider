@@ -23,14 +23,12 @@ namespace Script
         private void ChangeCardOutlook(PlayingCard pc)
         {
             //todo change picture
-            print(pc);
             _numberSprite.sprite = playingCardSprite.numbers[pc.GetNumber()];
             _shapeSprite.sprite = playingCardSprite.shapes[(int)pc.GetShape()];
         }
 
         public PlayingCardGameObject SetPlayingCard(PlayingCard pc)
         {
-            print(pc);
             _playingCard = pc;
             ChangeCardOutlook(pc);
             return this;

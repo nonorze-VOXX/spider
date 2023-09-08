@@ -33,7 +33,7 @@ namespace Script
 
         private Vector3 GetCardPosition(Vector3 position, int index)
         {
-            return new Vector3(position.x, position.y + index * 10, position.z);
+            return new Vector3(position.x, position.y - index * 1, position.z);
         }
 
         public CardStack SetPlayingcards(List<PlayingCard> playingCards)
