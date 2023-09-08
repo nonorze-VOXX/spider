@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 064ff3a811ab49a3bacc2a4fa1278e23, type: 3}
+  m_Name: PlayingCardSprite
+  m_EditorClassIdentifier: 
+  numbers:
+  - {fileID: 21300000, guid: ebf08dc44ee3c8f418de65f26525c08b, type: 3}
+  - {fileID: 21300000, guid: ebf08dc44ee3c8f418de65f26525c08b, type: 3}
+  - {fileID: 21300000, guid: 3c64131998cd9e74a9c42fac82d0635f, type: 3}
+  - {fileID: 21300000, guid: 2185aeed9ee626f4684c2b5b1fc38713, type: 3}
+  - {fileID: 21300000, guid: f9d453c7042446d44ab301f14c2ab169, type: 3}
+  - {fileID: 21300000, guid: 4d5bac50c827d754cb191e9a799c1a23, type: 3}
+  - {fileID: 21300000, guid: 144797b19e37e9040800d14182742c44, type: 3}
+  - {fileID: 21300000, guid: 4c982fbbf3afead408af92a99abb1f02, type: 3}
+  - {fileID: 21300000, guid: fa78225e2b52cb64e9937c340306d758, type: 3}
+  - {fileID: 21300000, guid: 13bf4b0c1941daa47af99577eacd2876, type: 3}
+  - {fileID: 21300000, guid: b27be6e571d166141afbed359d049956, type: 3}
+  - {fileID: 21300000, guid: 7d97d69b9fe3664439beb010e5990efa, type: 3}
+  - {fileID: 21300000, guid: 08299d6ecf5dbc94ca267ea912284d96, type: 3}
+  - {fileID: 21300000, guid: 4920cb372590569408bdec98665ce430, type: 3}
+  shapes:
+  - {fileID: 21300000, guid: 2fdd694ea9e4a6e45a233fddb262303c, type: 3}
+  - {fileID: 21300000, guid: 821c11d4acb7f464fa32103c9c3dbb85, type: 3}
+  - {fileID: 21300000, guid: 00d85bf18b624574998db316a2b1b308, type: 3}
+  - {fileID: 21300000, guid: 04b60e47360a19f44b0229d65b972070, type: 3}
