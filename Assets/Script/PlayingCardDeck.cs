@@ -21,6 +21,16 @@ namespace Script
                 }
         }
 
+        public List<PlayingCard> GetCards()
+        {
+            return cards;
+        }
+
+        /// <summary>
+        ///     draw card,
+        ///     if card is run out, bool will true
+        /// </summary>
+        /// <returns></returns>
         public Tuple<PlayingCard, bool> DrawCard()
         {
             var avaliable = GetAvaliable();

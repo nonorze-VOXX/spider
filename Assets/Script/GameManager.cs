@@ -4,67 +4,43 @@ using UnityEngine;
 
 namespace Script
 {
-    internal enum GameFlow
-    {
-        INIT,
-        PLAYING
-    }
-
     public class GameManager : MonoBehaviour
     {
         public GameObject cardStackPrefab;
+        public GameObject cardPrefab;
         private PlayingCardDeck _cardDecks;
         private List<CardStack> _cardStacks;
-        private GameFlow _gameFlow;
-        private List<List<PlayingCard>> playingCards;
+        private List<PlayingCardGameObject> _playingCardGameObjects;
+        private Queue<PlayingCardGameObject> playingCardGameObjectQueue;
 
         private void Awake()
         {
-            _gameFlow = GameFlow.INIT;
+            playingCardGameObjectQueue = new Queue<PlayingCardGameObject>();
+            _playingCardGameObjects = new List<PlayingCardGameObject>();
             _cardDecks = new PlayingCardDeck().MergeDeck(new PlayingCardDeck());
-            playingCards = new List<List<PlayingCard>>
+            for (var i = 0; i < 104; i++)
             {
-                new(), new(), new(), new(),
-                new(), new(), new(), new(), new(), new()
-            };
+                var (pc, empty) = _cardDecks.DrawCard();
+                if (empty) Debug.Log(i);
+                var cardGO = Instantiate(cardPrefab).GetComponent<PlayingCardGameObject>().SetPlayingCard(pc);
+                playingCardGameObjectQueue.Enqueue(cardGO);
+                _playingCardGameObjects.Add(cardGO);
+            }
+
             _cardStacks = new List<CardStack>();
+            for (var i = 0; i < 10; i++)
+            {
+                var c = Instantiate(cardStackPrefab).GetComponent<CardStack>();
+                c.transform.position = transform.position + Vector3.right * 5 * i;
+                _cardStacks.Add(c);
+            }
+
             for (var i = 0; i < 54; i++)
-            {
-                var (result, empty) = _cardDecks.DrawCard();
-                // print(result.GetNumber());
-                if (empty)
-                    print("empty");
-                else
-                    playingCards[i % 10].Add(result);
-                print(playingCards[i % 10][playingCards[i % 10].Count - 1].GetNumber());
-            }
-
-            var index = 0;
-            foreach (var playingCard in playingCards)
-            {
-                var stack = Instantiate(cardStackPrefab, transform).GetComponent<CardStack>()
-                    .GeneratePlayingCardGameObject(playingCard);
-                _cardStacks.Add(stack);
-                var position = stack.transform.position;
-                position.x = stack.transform.position.x + index * 5;
-                stack.transform.position = position;
-
-                index++;
-            }
+                _cardStacks[i % 10].Add(playingCardGameObjectQueue.Dequeue().SetHead(_cardStacks[i % 10].GetHead()));
         }
 
         private void Update()
         {
-            switch (_gameFlow)
-            {
-                case GameFlow.INIT:
-                    _gameFlow = GameFlow.PLAYING;
-                    break;
-                case GameFlow.PLAYING:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
         }
     }
 }
