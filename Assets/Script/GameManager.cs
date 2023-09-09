@@ -22,7 +22,9 @@ namespace Script
             {
                 var (pc, empty) = _cardDecks.DrawCard();
                 if (empty) Debug.Log(i);
-                var cardGO = Instantiate(cardPrefab).GetComponent<PlayingCardGameObject>().SetPlayingCard(pc);
+                var go = Instantiate(cardPrefab);
+                var cardGO = go.GetComponent<PlayingCardGameObject>().SetPlayingCard(pc);
+                cardGO.transform.name = pc.GetNumber() + pc.GetShape().ToString();
                 playingCardGameObjectQueue.Enqueue(cardGO);
                 _playingCardGameObjects.Add(cardGO);
             }

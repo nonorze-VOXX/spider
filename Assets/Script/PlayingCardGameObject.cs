@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Script
 {
@@ -12,9 +13,11 @@ namespace Script
         private PlayingCard _playingCard;
         private SpriteRenderer _shapeSprite;
         private CardStack targetStack;
+        private List<Collider2D> touchingObjects;
 
         private void Awake()
         {
+            touchingObjects = new List<Collider2D>();
             targetStack = null;
             _cardStack = null;
             _shapeSprite = transform.GetChild(0).GetComponent<SpriteRenderer>();
@@ -30,13 +33,16 @@ namespace Script
         {
             var cardPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             cardPosition.z = transform.position.z;
-            transform.position = cardPosition;
-            var now = this;
-            while (now.GetNext() != null)
+            SetBunchCardPosition(this, cardPosition);
+        }
+
+        private void OnMouseUp()
+        {
+            if (touchingObjects.Count != 0)
             {
-                now = now.GetNext();
-                cardPosition += Vector3.down;
-                now.transform.position = cardPosition;
+                var now = touchingObjects[^1].GetComponent<PlayingCardGameObject>();
+                while (now.GetNext() != null) now = now.GetNext();
+                SetBunchCardPosition(this, now.GetNextPosition());
             }
         }
 
@@ -45,6 +51,50 @@ namespace Script
         // {
         //     return _cardStack;
         // }
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            var head = other.GetComponent<PlayingCardGameObject>().GetHead();
+            if (!touchingObjects.Contains(other) && head != GetHead())
+                touchingObjects.Add(other);
+        }
+
+        private void OnTriggerExit2D(Collider2D other)
+        {
+            if (touchingObjects.Contains(other))
+            {
+                Debug.Log(other.name);
+                touchingObjects.Remove(other);
+            }
+        }
+
+        private void OnTriggerStay2D(Collider2D other)
+        {
+            // if (other.GetComponent<PlayingCardGameObject>().GetHead() != GetHead()) Debug.Log(other.name);
+        }
+
+        private void SetBunchCardPosition(PlayingCardGameObject head, Vector3 headPosition)
+        {
+            head.transform.position = headPosition;
+
+            SetBunchCardPosition(head);
+        }
+
+        private void SetBunchCardPosition(PlayingCardGameObject head)
+        {
+            Vector3 position;
+            var now = head;
+            while (now.GetNext() != null)
+            {
+                position = now.GetNextPosition();
+                now = now.GetNext();
+                now.transform.position = position;
+            }
+        }
+
+        private Vector3 GetNextPosition()
+        {
+            return transform.position + Vector3.down;
+        }
 
 
         private void ChangeCardOutlook(PlayingCard pc)
@@ -74,7 +124,7 @@ namespace Script
         public PlayingCardGameObject SetHead(PlayingCardGameObject head)
         {
             if (head == null)
-                head = this;
+                _head = this;
             else
                 _head = head;
 

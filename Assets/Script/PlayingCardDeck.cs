@@ -16,7 +16,8 @@ namespace Script
             foreach (var shapeName in Enum.GetValues(typeof(PlayingCardShape)))
                 for (var i = 1; i <= 13; i++)
                 {
-                    cards.Add(new PlayingCard(new CardContext { Shape = PlayingCardShape.SPADE, Number = i }));
+                    // cards.Add(new PlayingCard(new CardContext { Shape = PlayingCardShape.SPADE, Number = i }));
+                    cards.Add(new PlayingCard(new CardContext { Shape = (PlayingCardShape)shapeName, Number = i }));
                     avalible.Add(true);
                 }
         }
