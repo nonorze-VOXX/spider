@@ -38,7 +38,10 @@ namespace Script
             }
 
             for (var i = 0; i < 54; i++)
-                _cardStacks[i % 10].Add(playingCardGameObjectQueue.Dequeue().SetHead(_cardStacks[i % 10].GetHead()));
+            {
+                var stack = _cardStacks[i % 10];
+                stack.Add(playingCardGameObjectQueue.Dequeue().SetHead(stack.GetHead()).SetStack(stack));
+            }
         }
 
         private void Update()

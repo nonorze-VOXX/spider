@@ -12,21 +12,39 @@ namespace Script
         private SpriteRenderer _numberSprite;
         private PlayingCard _playingCard;
         private SpriteRenderer _shapeSprite;
-        private CardStack targetStack;
+        private CardStack stack;
         private List<Collider2D> touchingObjects;
 
         private void Awake()
         {
             touchingObjects = new List<Collider2D>();
-            targetStack = null;
+            stack = null;
             _cardStack = null;
             _shapeSprite = transform.GetChild(0).GetComponent<SpriteRenderer>();
             _numberSprite = transform.GetChild(1).GetComponent<SpriteRenderer>();
             _next = null;
         }
 
-        private void Start()
+        private void OnMouseDown()
         {
+            var now = _head;
+            if (now == null)
+            {
+                Debug.Log("null hean");
+                return;
+            }
+
+            if (now == this)
+            {
+                stack.SetHead(null);
+                SetHead(null);
+                return;
+            }
+
+            while (!(now.GetNext() == null || now.GetNext() == this)) now = now.GetNext();
+
+            now.SetNext(null);
+            SetHead(null);
         }
 
         private void OnMouseDrag()
@@ -38,19 +56,29 @@ namespace Script
 
         private void OnMouseUp()
         {
+            PlayingCardGameObject now;
             if (touchingObjects.Count != 0)
+                now = touchingObjects[^1].GetComponent<PlayingCardGameObject>();
+            else
+                now = stack.GetHead();
+
+            if (now == null)
             {
-                var now = touchingObjects[^1].GetComponent<PlayingCardGameObject>();
+                var position = GetStack().transform.position;
+                GetStack().SetHead(this);
+                SetHead(this);
+                SetBunchCardPosition(this, position);
+            }
+            else
+            {
                 while (now.GetNext() != null) now = now.GetNext();
-                SetBunchCardPosition(this, now.GetNextPosition());
+                now.SetNext(this);
+                SetHead(now.GetHead());
+                SetBunchCardPosition(now);
             }
         }
 
 
-        // private CardStack GetStack()
-        // {
-        //     return _cardStack;
-        // }
         private void OnTriggerEnter2D(Collider2D other)
         {
             var head = other.GetComponent<PlayingCardGameObject>().GetHead();
@@ -60,16 +88,13 @@ namespace Script
 
         private void OnTriggerExit2D(Collider2D other)
         {
-            if (touchingObjects.Contains(other))
-            {
-                Debug.Log(other.name);
-                touchingObjects.Remove(other);
-            }
+            if (!touchingObjects.Contains(other)) return;
+            touchingObjects.Remove(other);
         }
 
-        private void OnTriggerStay2D(Collider2D other)
+        private CardStack GetStack()
         {
-            // if (other.GetComponent<PlayingCardGameObject>().GetHead() != GetHead()) Debug.Log(other.name);
+            return stack;
         }
 
         private void SetBunchCardPosition(PlayingCardGameObject head, Vector3 headPosition)
@@ -134,6 +159,12 @@ namespace Script
         public PlayingCardGameObject GetHead()
         {
             return _head;
+        }
+
+        public PlayingCardGameObject SetStack(CardStack cardStack)
+        {
+            stack = cardStack;
+            return this;
         }
     }
 }
