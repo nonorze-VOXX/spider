@@ -35,12 +35,19 @@ namespace Script
                 var c = Instantiate(cardStackPrefab).GetComponent<CardStack>();
                 c.transform.position = transform.position + Vector3.right * 5 * i;
                 _cardStacks.Add(c);
+                var slot = Instantiate(cardPrefab).GetComponent<PlayingCardGameObject>();
+                slot = slot.SetSlot(true);
+                slot.SetHead(null);
+                slot.SetPlayingCard(null);
+                slot.SetStack(c);
+                slot.transform.name = "slot" + i;
+                c.AddTailSetPosition(slot);
             }
 
             for (var i = 0; i < 54; i++)
             {
                 var stack = _cardStacks[i % 10];
-                stack.Add(playingCardGameObjectQueue.Dequeue().SetHead(stack.GetHead()).SetStack(stack));
+                stack.AddTailSetPosition(playingCardGameObjectQueue.Dequeue().SetHead(stack.GetHead()).SetStack(stack));
             }
         }
 

@@ -6,95 +6,76 @@ namespace Script
     public class PlayingCardGameObject : MonoBehaviour
     {
         public PlayingCardSprite playingCardSprite;
+        private SpriteRenderer _backSprite;
         private CardStack _cardStack;
         private PlayingCardGameObject _head;
+        private bool _isSlot;
         private PlayingCardGameObject _next;
         private SpriteRenderer _numberSprite;
         private PlayingCard _playingCard;
         private SpriteRenderer _shapeSprite;
-        private CardStack stack;
-        private List<Collider2D> touchingObjects;
+        private List<Collider2D> _touchingObjects;
 
         private void Awake()
         {
-            touchingObjects = new List<Collider2D>();
-            stack = null;
+            _isSlot = false;
+            _touchingObjects = new List<Collider2D>();
             _cardStack = null;
             _shapeSprite = transform.GetChild(0).GetComponent<SpriteRenderer>();
             _numberSprite = transform.GetChild(1).GetComponent<SpriteRenderer>();
+            _backSprite = transform.GetChild(2).GetComponent<SpriteRenderer>();
             _next = null;
         }
 
         private void OnMouseDown()
         {
-            var now = _head;
-            if (now == null)
-            {
-                Debug.Log("null hean");
-                return;
-            }
-
-            if (now == this)
-            {
-                stack.SetHead(null);
-                SetHead(null);
-                return;
-            }
-
-            while (!(now.GetNext() == null || now.GetNext() == this)) now = now.GetNext();
-
-            now.SetNext(null);
-            SetHead(null);
+            if (!_isSlot) GetStack().Disconnect(this);
         }
 
         private void OnMouseDrag()
         {
-            var cardPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            cardPosition.z = transform.position.z;
-            SetBunchCardPosition(this, cardPosition);
+            if (!_isSlot)
+            {
+                var cardPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                cardPosition.z = transform.position.z;
+                SetBunchCardPosition(this, cardPosition);
+            }
         }
 
         private void OnMouseUp()
         {
-            PlayingCardGameObject now;
-            if (touchingObjects.Count != 0)
-                now = touchingObjects[^1].GetComponent<PlayingCardGameObject>();
-            else
-                now = stack.GetHead();
+            if (!_isSlot)
+            {
+                CardStack stack;
+                if (_touchingObjects.Count == 0)
+                    stack = GetStack();
+                else
+                    stack = _touchingObjects[^1].gameObject.transform.GetComponent<PlayingCardGameObject>().GetStack();
 
-            if (now == null)
-            {
-                var position = GetStack().transform.position;
-                GetStack().SetHead(this);
-                SetHead(this);
-                SetBunchCardPosition(this, position);
-            }
-            else
-            {
-                while (now.GetNext() != null) now = now.GetNext();
-                now.SetNext(this);
-                SetHead(now.GetHead());
-                SetBunchCardPosition(now);
+                var preTail = stack.GetTail();
+                stack.Connect(this);
+                SetBunchCardPosition(preTail);
             }
         }
 
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            var head = other.GetComponent<PlayingCardGameObject>().GetHead();
-            if (!touchingObjects.Contains(other) && head != GetHead())
-                touchingObjects.Add(other);
+            print(other.transform.name);
+            var stack = other.GetComponent<PlayingCardGameObject>().GetStack();
+            if (!_touchingObjects.Contains(other) && stack != GetStack())
+                _touchingObjects.Add(other);
         }
 
         private void OnTriggerExit2D(Collider2D other)
         {
-            if (!touchingObjects.Contains(other)) return;
-            touchingObjects.Remove(other);
+            if (!_touchingObjects.Contains(other)) return;
+            _touchingObjects.Remove(other);
         }
 
         private CardStack GetStack()
         {
-            return stack;
+            return _cardStack;
         }
 
         private void SetBunchCardPosition(PlayingCardGameObject head, Vector3 headPosition)
@@ -124,6 +105,15 @@ namespace Script
 
         private void ChangeCardOutlook(PlayingCard pc)
         {
+            if (pc == null)
+            {
+                _numberSprite.gameObject.SetActive(false);
+                _shapeSprite.gameObject.SetActive(false);
+                _backSprite.gameObject.SetActive(true);
+                _backSprite.sprite = playingCardSprite.back[0];
+                return;
+            }
+
             //todo change picture
             _numberSprite.sprite = playingCardSprite.numbers[pc.GetNumber()];
             _shapeSprite.sprite = playingCardSprite.shapes[(int)pc.GetShape()];
@@ -148,10 +138,7 @@ namespace Script
 
         public PlayingCardGameObject SetHead(PlayingCardGameObject head)
         {
-            if (head == null)
-                _head = this;
-            else
-                _head = head;
+            _head = head;
 
             return this;
         }
@@ -163,7 +150,13 @@ namespace Script
 
         public PlayingCardGameObject SetStack(CardStack cardStack)
         {
-            stack = cardStack;
+            _cardStack = cardStack;
+            return this;
+        }
+
+        public PlayingCardGameObject SetSlot(bool b)
+        {
+            _isSlot = b;
             return this;
         }
     }

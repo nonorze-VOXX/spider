@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Script
@@ -20,7 +21,7 @@ namespace Script
             return _head;
         }
 
-        public void Add(PlayingCardGameObject result)
+        public void AddTailSetPosition(PlayingCardGameObject result)
         {
             if (_head == null)
             {
@@ -34,6 +35,53 @@ namespace Script
                 now.SetNext(result);
                 result.transform.position = now.transform.position + new Vector3(0, -1.0f, -1.0f);
             }
+        }
+
+        public void Connect(PlayingCardGameObject target)
+        {
+            var now = _head;
+            while (now.GetNext() != null) now = now.GetNext();
+            now.SetNext(target);
+
+            while (now.GetNext() != null)
+            {
+                now = now.GetNext();
+                now.SetHead(_head);
+                now.SetStack(this);
+            }
+        }
+
+        public void Disconnect(PlayingCardGameObject target)
+        {
+            var pre = FindPreNodeOfTarget(target);
+            pre.SetNext(null);
+            {
+                target.SetHead(null);
+                target.SetHead(null);
+                var now = target;
+                while (now.GetNext() != null)
+                {
+                    now = now.GetNext();
+                    now.SetHead(target);
+                }
+            }
+        }
+
+        public PlayingCardGameObject GetTail()
+        {
+            return FindPreNodeOfTarget(null);
+        }
+
+        public PlayingCardGameObject FindPreNodeOfTarget(PlayingCardGameObject target)
+        {
+            var now = _head;
+            while (now.GetNext() != target)
+            {
+                if (now.GetNext() == null) throw new Exception("target no found;");
+                now = now.GetNext();
+            }
+
+            return now;
         }
     }
 }

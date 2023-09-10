@@ -8,5 +8,6 @@ namespace Script
     {
         public List<Sprite> numbers;
         public List<Sprite> shapes;
+        public List<Sprite> back;
     }
 }
