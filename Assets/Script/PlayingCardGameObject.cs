@@ -8,6 +8,8 @@ namespace Script
         public PlayingCardSprite playingCardSprite;
         private SpriteRenderer _backSprite;
         private CardStack _cardStack;
+        private SpriteRenderer _emptySprite;
+        private GameManager _gameManager;
         private PlayingCardGameObject _head;
         private bool _isSlot;
         private PlayingCardGameObject _next;
@@ -15,25 +17,31 @@ namespace Script
         private PlayingCard _playingCard;
         private SpriteRenderer _shapeSprite;
         private List<Collider2D> _touchingObjects;
+        private bool waiting;
 
         private void Awake()
         {
+            waiting = false;
             _isSlot = false;
             _touchingObjects = new List<Collider2D>();
             _cardStack = null;
             _shapeSprite = transform.GetChild(0).GetComponent<SpriteRenderer>();
             _numberSprite = transform.GetChild(1).GetComponent<SpriteRenderer>();
             _backSprite = transform.GetChild(2).GetComponent<SpriteRenderer>();
+            _emptySprite = transform.GetChild(3).GetComponent<SpriteRenderer>();
             _next = null;
         }
 
         private void OnMouseDown()
         {
+            if (waiting) return;
+
             if (!_isSlot) GetStack().Disconnect(this);
         }
 
         private void OnMouseDrag()
         {
+            if (waiting) return;
             if (!_isSlot)
             {
                 var cardPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -44,6 +52,12 @@ namespace Script
 
         private void OnMouseUp()
         {
+            if (waiting)
+            {
+                _gameManager.FaCard();
+                return;
+            }
+
             if (!_isSlot)
             {
                 CardStack stack;
@@ -71,6 +85,17 @@ namespace Script
         {
             if (!_touchingObjects.Contains(other)) return;
             _touchingObjects.Remove(other);
+        }
+
+        public void SetGameManager(GameManager gameManager)
+        {
+            _gameManager = gameManager;
+        }
+
+        public PlayingCardGameObject SetWaiting(bool b)
+        {
+            waiting = b;
+            return this;
         }
 
         private CardStack GetStack()
@@ -109,6 +134,7 @@ namespace Script
             {
                 _numberSprite.gameObject.SetActive(false);
                 _shapeSprite.gameObject.SetActive(false);
+                _emptySprite.gameObject.SetActive(false);
                 _backSprite.gameObject.SetActive(true);
                 _backSprite.sprite = playingCardSprite.back[0];
                 return;

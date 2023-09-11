@@ -33,7 +33,7 @@ namespace Script
                 var now = _head;
                 while (now.GetNext() != null) now = now.GetNext();
                 now.SetNext(result);
-                result.transform.position = now.transform.position + new Vector3(0, -1.0f, -1.0f);
+                result.transform.position = now.transform.position + new Vector3(0, -1.0f, -0.0f);
             }
         }
 
