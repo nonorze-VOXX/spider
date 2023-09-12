@@ -183,7 +183,6 @@ namespace Script
                 _shapeSprite.gameObject.SetActive(false);
                 _emptySprite.gameObject.SetActive(false);
                 _backSprite.gameObject.SetActive(true);
-                _backSprite.sprite = playingCardSprite.back[0];
                 return;
             }
 
