@@ -57,6 +57,7 @@ namespace Script
             if (waiting)
             {
                 _gameManager.FaCard();
+                _gameManager.SetCardStateUpdated(false);
                 return;
             }
 
@@ -71,12 +72,9 @@ namespace Script
                 {
                     stack = _touchingObjects[^1].gameObject.transform.GetComponent<PlayingCardGameObject>().GetStack();
                     if (stack.GetTail().CanConnect(this))
-                    {
-                    }
+                        _gameManager.SetCardStateUpdated(false);
                     else
-                    {
                         stack = GetStack();
-                    }
                 }
 
                 var preTail = stack.GetTail();
@@ -88,7 +86,6 @@ namespace Script
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            print(other.transform.name);
             var stack = other.GetComponent<PlayingCardGameObject>().GetStack();
             if (!_touchingObjects.Contains(other) && stack != GetStack())
                 _touchingObjects.Add(other);
@@ -169,26 +166,36 @@ namespace Script
             }
         }
 
-        private Vector3 GetNextPosition()
+        public Vector3 GetNextPosition()
         {
-            return transform.position + Vector3.down;
+            return transform.position + Vector3.down + new Vector3(0, 0, -1);
         }
 
 
         private void ChangeCardOutlook(PlayingCard pc)
         {
-            if (pc == null)
+            if (pc == null || !pc.GetOpen())
             {
                 _numberSprite.gameObject.SetActive(false);
                 _shapeSprite.gameObject.SetActive(false);
                 _emptySprite.gameObject.SetActive(false);
                 _backSprite.gameObject.SetActive(true);
+                if (pc == null)
+                    _backSprite.sprite = playingCardSprite.back[0];
+                else
+                    _backSprite.sprite = playingCardSprite.back[1];
                 return;
             }
 
-            //todo change picture
-            _numberSprite.sprite = playingCardSprite.numbers[pc.GetNumber()];
-            _shapeSprite.sprite = playingCardSprite.shapes[(int)pc.GetShape()];
+            if (pc.GetOpen())
+            {
+                _numberSprite.gameObject.SetActive(true);
+                _shapeSprite.gameObject.SetActive(true);
+                _emptySprite.gameObject.SetActive(true);
+                _backSprite.gameObject.SetActive(false);
+                _numberSprite.sprite = playingCardSprite.numbers[pc.GetNumber()];
+                _shapeSprite.sprite = playingCardSprite.shapes[(int)pc.GetShape()];
+            }
         }
 
         public PlayingCardGameObject SetPlayingCard(PlayingCard pc)
@@ -230,6 +237,12 @@ namespace Script
         {
             _isSlot = b;
             return this;
+        }
+
+        public void OpenCard()
+        {
+            _playingCard.SetOpen(true);
+            ChangeCardOutlook(_playingCard);
         }
     }
 }

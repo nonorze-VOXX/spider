@@ -18,10 +18,23 @@ namespace Script
     {
         // public bool open;
         private readonly CardContext _context;
+        private bool _open;
 
         public PlayingCard(CardContext context)
         {
+            _open = false;
             _context = context;
+        }
+
+        public PlayingCard SetOpen(bool open)
+        {
+            _open = open;
+            return this;
+        }
+
+        public bool GetOpen()
+        {
+            return _open;
         }
 
         public int GetNumber()

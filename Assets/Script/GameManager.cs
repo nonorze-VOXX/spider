@@ -10,6 +10,7 @@ namespace Script
         public GameObject cardPrefab;
         private PlayingCardDeck _cardDecks;
         private List<CardStack> _cardStacks;
+        private bool _cardStateUpdated;
         private List<PlayingCardGameObject> _playingCardGameObjects;
         private Queue<Queue<PlayingCardGameObject>> playingCardGameObjectListQueue;
         private Queue<PlayingCardGameObject> playingCardGameObjectQueue;
@@ -58,7 +59,6 @@ namespace Script
                 var pcList = new Queue<PlayingCardGameObject>();
                 for (var i = 0; i < 10; i++)
                 {
-                    print(i);
                     var pc = playingCardGameObjectQueue.Dequeue();
                     pc.SetWaiting(true);
                     pcList.Enqueue(pc);
@@ -73,6 +73,27 @@ namespace Script
                 foreach (var j in i) j.transform.position = position;
                 position += Vector3.right;
             }
+
+            _cardStateUpdated = false;
+        }
+
+        private void Update()
+        {
+            if (!_cardStateUpdated)
+            {
+                UpdateCardState(_cardStacks);
+                _cardStateUpdated = true;
+            }
+        }
+
+        public void SetCardStateUpdated(bool updated)
+        {
+            _cardStateUpdated = updated;
+        }
+
+        private void UpdateCardState(List<CardStack> cardStacks)
+        {
+            foreach (var cardStack in cardStacks) cardStack.GetTail().OpenCard();
         }
 
         public void FaCard()
