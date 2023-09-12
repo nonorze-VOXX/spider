@@ -42,13 +42,15 @@ namespace Script
         private void OnMouseDrag()
         {
             if (waiting) return;
-            if (!_isSlot)
+            if (_isSlot) return;
+            if (DownIsConnection())
             {
                 var cardPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 cardPosition.z = transform.position.z;
                 SetBunchCardPosition(this, cardPosition);
             }
         }
+
 
         private void OnMouseUp()
         {
@@ -62,9 +64,20 @@ namespace Script
             {
                 CardStack stack;
                 if (_touchingObjects.Count == 0)
+                {
                     stack = GetStack();
+                }
                 else
+                {
                     stack = _touchingObjects[^1].gameObject.transform.GetComponent<PlayingCardGameObject>().GetStack();
+                    if (stack.GetTail().CanConnect(this))
+                    {
+                    }
+                    else
+                    {
+                        stack = GetStack();
+                    }
+                }
 
                 var preTail = stack.GetTail();
                 stack.Connect(this);
@@ -85,6 +98,40 @@ namespace Script
         {
             if (!_touchingObjects.Contains(other)) return;
             _touchingObjects.Remove(other);
+        }
+
+        private bool DownIsConnection()
+        {
+            var now = this;
+            while (now.GetNext() != null)
+            {
+                if (IsSameShape(now) && IsNumberConnectDown(now))
+                    return false;
+                now = now.GetNext();
+            }
+
+            return true;
+        }
+
+        private bool IsNumberConnectDown(PlayingCardGameObject now)
+        {
+            return now.GetPlayingCard().GetNumber() + 1 == GetPlayingCard().GetNumber();
+        }
+
+        private bool IsSameShape(PlayingCardGameObject now)
+        {
+            return now.GetPlayingCard().GetShape() != GetPlayingCard().GetShape();
+        }
+
+        private bool CanConnect(PlayingCardGameObject playingCardGameObject)
+        {
+            return GetPlayingCard().GetNumber() - 1 ==
+                   playingCardGameObject.GetPlayingCard().GetNumber();
+        }
+
+        private PlayingCard GetPlayingCard()
+        {
+            return _playingCard;
         }
 
         public void SetGameManager(GameManager gameManager)
