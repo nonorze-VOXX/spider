@@ -41,6 +41,7 @@ namespace Script
 
         private void OnMouseDrag()
         {
+            if (!GetOpen()) return;
             if (waiting) return;
             if (_isSlot) return;
             if (DownIsConnection())
@@ -71,7 +72,7 @@ namespace Script
                 else
                 {
                     stack = _touchingObjects[^1].gameObject.transform.GetComponent<PlayingCardGameObject>().GetStack();
-                    if (stack.GetTail().CanConnect(this))
+                    if (stack.GetTail().CanNumberConnect(this))
                         _gameManager.SetCardStateUpdated(false);
                     else
                         stack = GetStack();
@@ -102,7 +103,8 @@ namespace Script
             var now = this;
             while (now.GetNext() != null)
             {
-                if (IsSameShape(now) && IsNumberConnectDown(now))
+                print(now.IsSameShape(now.GetNext()));
+                if (!now.IsSameShape(now.GetNext()) || !now.IsNumberConnectDown(now.GetNext()))
                     return false;
                 now = now.GetNext();
             }
@@ -117,13 +119,20 @@ namespace Script
 
         private bool IsSameShape(PlayingCardGameObject now)
         {
-            return now.GetPlayingCard().GetShape() != GetPlayingCard().GetShape();
+            return now.GetPlayingCard().GetShape() == GetPlayingCard().GetShape();
         }
 
-        private bool CanConnect(PlayingCardGameObject playingCardGameObject)
+        private bool CanNumberConnect(PlayingCardGameObject playingCardGameObject)
         {
             return GetPlayingCard().GetNumber() - 1 ==
                    playingCardGameObject.GetPlayingCard().GetNumber();
+        }
+
+        public bool CanTotalConnect(PlayingCardGameObject playingCardGameObject)
+        {
+            return GetPlayingCard().GetNumber() - 1 ==
+                   playingCardGameObject.GetPlayingCard().GetNumber() &&
+                   GetPlayingCard().GetShape() == playingCardGameObject.GetPlayingCard().GetShape();
         }
 
         private PlayingCard GetPlayingCard()
@@ -243,6 +252,17 @@ namespace Script
         {
             _playingCard.SetOpen(true);
             ChangeCardOutlook(_playingCard);
+        }
+
+        public int GetNumber()
+        {
+            return GetPlayingCard().GetNumber();
+        }
+
+        public bool GetOpen()
+        {
+            if (_isSlot) return false;
+            return GetPlayingCard().GetOpen();
         }
     }
 }

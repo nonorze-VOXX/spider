@@ -21,6 +21,7 @@ namespace Script
             playingCardGameObjectQueue = new Queue<PlayingCardGameObject>();
             _playingCardGameObjects = new List<PlayingCardGameObject>();
             _cardDecks = new PlayingCardDeck().MergeDeck(new PlayingCardDeck());
+            // _cardDecks.Shuffle();
             for (var i = 0; i < 104; i++)
             {
                 var (pc, empty) = _cardDecks.DrawCard();
@@ -94,6 +95,38 @@ namespace Script
         private void UpdateCardState(List<CardStack> cardStacks)
         {
             foreach (var cardStack in cardStacks) cardStack.GetTail().OpenCard();
+            CollectCheck(cardStacks);
+        }
+
+        private void CollectCheck(List<CardStack> cardStacks)
+        {
+            foreach (var stack in cardStacks)
+            {
+                var now = stack.GetHead();
+                var continuous = false;
+                while (now.GetNext() != null)
+                {
+                    if (!now.GetOpen())
+                    {
+                    }
+                    else if (now.GetNumber() == 1 && continuous)
+                    {
+                        //find
+                        Debug.Log("find");
+                        break;
+                    }
+                    else if (now.GetNumber() == 13 || continuous)
+                    {
+                        continuous = true;
+                        continuous = continuous && now.CanTotalConnect(now.GetNext());
+                    }
+                    else
+                    {
+                    }
+
+                    now = now.GetNext();
+                }
+            }
         }
 
         public void FaCard()
@@ -106,8 +139,6 @@ namespace Script
                 card.SetHead(stack.GetHead());
                 card.SetStack(stack);
                 card.SetWaiting(false);
-                print(stack.GetTail().transform.name + "->" + card.transform.name + " s stackname " +
-                      stack.transform.name);
                 stack.AddTailSetPosition(card);
             }
         }
