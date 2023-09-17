@@ -82,6 +82,7 @@ namespace Script
         {
             if (!_cardStateUpdated)
             {
+                print("update card");
                 UpdateCardState(_cardStacks);
                 _cardStateUpdated = true;
             }
@@ -109,19 +110,12 @@ namespace Script
                     if (!now.GetOpen())
                     {
                     }
-                    else if (now.GetNumber() == 1 && continuous)
-                    {
-                        //find
-                        Debug.Log("find");
-                        break;
-                    }
                     else if (now.GetNumber() == 13 || continuous)
                     {
+                        Debug.Log(now.GetNumber());
                         continuous = true;
                         continuous = continuous && now.CanTotalConnect(now.GetNext());
-                    }
-                    else
-                    {
+                        if (now.GetNext().GetNumber() == 1 && continuous) Debug.Log("find");
                     }
 
                     now = now.GetNext();

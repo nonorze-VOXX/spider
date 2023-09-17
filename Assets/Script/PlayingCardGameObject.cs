@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 namespace Script
@@ -13,7 +14,7 @@ namespace Script
         private PlayingCardGameObject _head;
         private bool _isSlot;
         private PlayingCardGameObject _next;
-        private SpriteRenderer _numberSprite;
+        private TextMeshPro _numberText;
         private PlayingCard _playingCard;
         private SpriteRenderer _shapeSprite;
         private List<Collider2D> _touchingObjects;
@@ -26,7 +27,7 @@ namespace Script
             _touchingObjects = new List<Collider2D>();
             _cardStack = null;
             _shapeSprite = transform.GetChild(0).GetComponent<SpriteRenderer>();
-            _numberSprite = transform.GetChild(1).GetComponent<SpriteRenderer>();
+            _numberText = transform.GetChild(1).GetComponent<TextMeshPro>();
             _backSprite = transform.GetChild(2).GetComponent<SpriteRenderer>();
             _emptySprite = transform.GetChild(3).GetComponent<SpriteRenderer>();
             _next = null;
@@ -103,7 +104,6 @@ namespace Script
             var now = this;
             while (now.GetNext() != null)
             {
-                print(now.IsSameShape(now.GetNext()));
                 if (!now.IsSameShape(now.GetNext()) || !now.IsNumberConnectDown(now.GetNext()))
                     return false;
                 now = now.GetNext();
@@ -185,7 +185,7 @@ namespace Script
         {
             if (pc == null || !pc.GetOpen())
             {
-                _numberSprite.gameObject.SetActive(false);
+                _numberText.gameObject.SetActive(false);
                 _shapeSprite.gameObject.SetActive(false);
                 _emptySprite.gameObject.SetActive(false);
                 _backSprite.gameObject.SetActive(true);
@@ -198,11 +198,11 @@ namespace Script
 
             if (pc.GetOpen())
             {
-                _numberSprite.gameObject.SetActive(true);
+                _numberText.gameObject.SetActive(true);
                 _shapeSprite.gameObject.SetActive(true);
                 _emptySprite.gameObject.SetActive(true);
                 _backSprite.gameObject.SetActive(false);
-                _numberSprite.sprite = playingCardSprite.numbers[pc.GetNumber()];
+                _numberText.text = pc.GetNumber().ToString();
                 _shapeSprite.sprite = playingCardSprite.shapes[(int)pc.GetShape()];
             }
         }
