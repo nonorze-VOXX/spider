@@ -6,17 +6,20 @@ namespace Script
 {
     public class GameManager : MonoBehaviour
     {
+        private static readonly Vector3 cardWidth = new Vector2(5, 0);
         public GameObject cardStackPrefab;
         public GameObject cardPrefab;
         private PlayingCardDeck _cardDecks;
         private List<CardStack> _cardStacks;
         private bool _cardStateUpdated;
         private List<PlayingCardGameObject> _playingCardGameObjects;
+        private int collectedTimes;
         private Queue<Queue<PlayingCardGameObject>> playingCardGameObjectListQueue;
         private Queue<PlayingCardGameObject> playingCardGameObjectQueue;
 
         private void Awake()
         {
+            collectedTimes = 0;
             playingCardGameObjectListQueue = new Queue<Queue<PlayingCardGameObject>>();
             playingCardGameObjectQueue = new Queue<PlayingCardGameObject>();
             _playingCardGameObjects = new List<PlayingCardGameObject>();
@@ -38,7 +41,7 @@ namespace Script
             for (var i = 0; i < 10; i++)
             {
                 var c = Instantiate(cardStackPrefab).GetComponent<CardStack>();
-                c.transform.position = transform.position + Vector3.right * 5 * i;
+                c.transform.position = transform.position + cardWidth * i;
                 _cardStacks.Add(c);
                 var slot = Instantiate(cardPrefab).GetComponent<PlayingCardGameObject>();
                 slot = slot.SetSlot(true);
@@ -96,31 +99,62 @@ namespace Script
         private void UpdateCardState(List<CardStack> cardStacks)
         {
             foreach (var cardStack in cardStacks) cardStack.GetTail().OpenCard();
-            CollectCheck(cardStacks);
+            var collectHead = CollectCheck(cardStacks);
+            if (collectHead != null)
+            {
+                print(collectHead);
+                Collect(collectHead, collectedTimes);
+            }
         }
 
-        private void CollectCheck(List<CardStack> cardStacks)
+        private PlayingCardGameObject CollectCheck(List<CardStack> cardStacks)
         {
             foreach (var stack in cardStacks)
             {
                 var now = stack.GetHead();
                 var continuous = false;
+                var collectHead = now;
                 while (now.GetNext() != null)
                 {
                     if (!now.GetOpen())
                     {
+                        continuous = false;
                     }
                     else if (now.GetNumber() == 13 || continuous)
                     {
-                        Debug.Log(now.GetNumber());
+                        if (now.GetNumber() == 13)
+                            collectHead = now;
                         continuous = true;
                         continuous = continuous && now.CanTotalConnect(now.GetNext());
-                        if (now.GetNext().GetNumber() == 1 && continuous) Debug.Log("find");
+                        if (now.GetNext().GetNumber() == 1 && continuous)
+                        {
+                            Debug.Log("find");
+                            return collectHead;
+                        }
                     }
 
                     now = now.GetNext();
                 }
             }
+
+            return null;
+        }
+
+        private void Collect(PlayingCardGameObject head, int CollectedTimes)
+        {
+            var now = head;
+            head.GetStack().Disconnect(head);
+            for (var i = 0; i < 13; i++)
+            {
+                now.Collect(GetCollectPosition(collectedTimes));
+                now = now.GetNext();
+            }
+        }
+
+        private Vector2 GetCollectPosition(int collectedTimes)
+        {
+            var stackLeftPosition = new Vector3(10, 4);
+            return this.collectedTimes * cardWidth + stackLeftPosition;
         }
 
         public void FaCard()

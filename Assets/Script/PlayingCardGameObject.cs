@@ -151,7 +151,7 @@ namespace Script
             return this;
         }
 
-        private CardStack GetStack()
+        public CardStack GetStack()
         {
             return _cardStack;
         }
@@ -263,6 +263,12 @@ namespace Script
         {
             if (_isSlot) return false;
             return GetPlayingCard().GetOpen();
+        }
+
+        public void Collect(Vector2 getCollectPosition)
+        {
+            transform.position = getCollectPosition;
+            _isSlot = true;
         }
     }
 }
