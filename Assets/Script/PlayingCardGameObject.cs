@@ -177,6 +177,8 @@ namespace Script
 
         public Vector3 GetNextPosition()
         {
+            if (_isSlot)
+                return transform.position+ new Vector3(0, 0, -1);
             return transform.position + Vector3.down + new Vector3(0, 0, -1);
         }
 
